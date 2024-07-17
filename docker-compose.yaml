@@ -1,0 +1,48 @@
+# Important: the api-server port (number 8000) and the db port (number 5432) are exposed just for test purposes.
+# No port besides the one from the frontend (number 3000) needs to be exposed, as all services are inside the same
+# docker network.
+
+services:
+  db:
+    image: postgres:16.3
+    environment:
+      POSTGRES_PASSWORD: secretpassword
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: always
+    # The port below is exposed just for test purposes.
+    ports:
+      - 5432:5432
+
+  api-server:
+    build: ./api_server
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f -s -o /dev/null http://localhost:8000/health || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: always
+    # The port below is exposed just for test purposes.
+    ports:
+      - 8000:8000
+
+  data-generator:
+    build: ./data_generator
+    depends_on:
+      api-server:
+        condition: service_healthy
+    restart: always
+
+  frontend:
+    build: ./frontend
+    depends_on:
+      api-server:
+        condition: service_healthy
+    ports:
+      - 3000:3000

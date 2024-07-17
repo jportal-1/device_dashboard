@@ -1,0 +1,6 @@
+fastapi
+pandas
+psycopg2
+sqlalchemy
+sqlalchemy-utils
+typing_extensions
