@@ -11,7 +11,7 @@ This application is a dashboard that monitors the vibration velocity of devices.
 
 ## How to use
 
-Clone this repository and run `docker compose up` inside the repository folder. When all containers are running, open a browser and access http://localhost:3000 , where is the login screen of Grafana. Click in the "Sign in with GitHub" button to log in using your GitHub account. On the left menu, click in "Dashboards" and after in "Device Acceleration Velocity Dashboard". The dashboard shown in the image below will appear. If there is no data, wait 1 minute and it should be updated.
+Clone this repository and run `docker compose up` inside the repository folder (tested on Ubuntu 22.04.4 LTS with Docker Desktop 4.32.0). When all containers are running, open a browser and access http://localhost:3000 , where is the login screen of Grafana. Click in the "Sign in with GitHub" button to log in using your GitHub account. On the left menu, click in "Dashboards" and after in "Device Acceleration Velocity Dashboard". The dashboard shown in the image below will appear. If there is no data, wait 1 minute and it should be updated.
 
 ![dashboard](https://github.com/user-attachments/assets/c2169a16-c084-42a8-9dfe-aff4f63e1983)
 
