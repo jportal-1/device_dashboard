@@ -18,9 +18,3 @@ class TimeSeriesEntry(BaseModel):
     device_name: str
     vibration_velocity: int
     timestamp: datetime
-
-class TimeSeriesEntryDB(TimeSeriesEntry):
-    id: int
-
-    class Config:
-        from_attributes = True
