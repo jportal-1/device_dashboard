@@ -4,7 +4,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy_utils import database_exists, create_database
 
 
-engine = create_engine("postgresql://postgres:secretpassword@db:5432/timeseriesdb")
+engine = create_engine("postgresql://postgres:secretpassword@db:5432/devicedashboarddb")
 if not database_exists(engine.url):
     create_database(engine.url)
 

@@ -32,3 +32,21 @@ def get_device_entries(db: Session, device_name: str, since: datetime):
               .order_by(models.TimeSeriesEntryDB.timestamp.asc()) \
               .all()
     return query
+
+def add_user_entry(db: Session, username: str, hashed_password: str):
+    db_entry = get_user_entry(db=db, username=username)
+    if db_entry is None:
+        db_entry = models.UserEntryDB(username=username, hashed_password=hashed_password)
+        db.add(db_entry)
+        db.commit()
+        db.refresh(db_entry)
+    else:
+        db_entry.hashed_password = hashed_password
+        db.commit()
+        db.refresh(db_entry)
+    return db_entry
+
+def get_user_entry(db: Session, username: str):
+    return db.query(models.UserEntryDB) \
+             .filter(models.UserEntryDB.username == username) \
+             .first()

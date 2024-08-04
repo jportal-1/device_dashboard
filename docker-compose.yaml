@@ -1,7 +1,3 @@
-# Important: the api-server port (number 8000) and the db port (number 5432) are exposed just for test purposes.
-# No port besides the one from the frontend (number 3000) needs to be exposed, as all services are inside the same
-# docker network.
-
 services:
   db:
     image: postgres:16.3
@@ -13,7 +9,6 @@ services:
       timeout: 5s
       retries: 5
     restart: always
-    # The port below is exposed just for test purposes.
     ports:
       - 5432:5432
 
@@ -28,7 +23,6 @@ services:
       timeout: 5s
       retries: 5
     restart: always
-    # The port below is exposed just for test purposes.
     ports:
       - 8000:8000
 
@@ -45,4 +39,4 @@ services:
       api-server:
         condition: service_healthy
     ports:
-      - 3000:3000
+      - 4200:80

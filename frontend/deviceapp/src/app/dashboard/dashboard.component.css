@@ -1,0 +1,30 @@
+.title {
+  text-align: center;
+  margin: 20px;
+  font-size: 22px;
+}
+
+.chart {
+  width: 1000px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.device-table {
+  width: 1000px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.mat-column-name {
+  border-right: 1px solid currentColor;
+  text-align: center;
+}
+.mat-column-velocity {
+  border-right: 1px solid currentColor;
+  text-align: center;
+}
+
+.logout-button {
+  text-align: end;
+}

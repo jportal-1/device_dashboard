@@ -2,20 +2,38 @@
 
 ## What it is
 
-This application is a dashboard that monitors the vibration velocity of devices. It is a fully containerized solution composed by 4 parts, each one running inside a container:
+This application is a full stack solution to showcase the following technologies: Docker, PostgreSQL, FastAPI (Python framework for API server), SQLAlchemy (SQL toolkit and ORM in Python), Pydantic (data parsing and validation in Python), Pandas (data manipulation and analysis in Python), Celery (task queue in Python), TypeScript (superset of JavaScript language), Angular (TypeScript-based web framework), Nginx (HTTP server) and OAuth 2.0 (authorization protocol).
+
+The application is a dashboard that monitors the vibration velocity of devices. It is composed of 4 parts, each running inside a container, described below.
 
 - PostgreSQL database, where all data is stored.
-- The API server, based on FastAPI, where the the device data requests are handled. It is the only entity that connects to the database.
-- The data generator, that generates random device data and sends to the API server. It only communicates with the API server.
-- The frontend, that is an instance of Grafana, that shows the device data. It only communicates with the API server.
+- The API server, implemented using FastAPI, SQLAlquemy, Pydantic, Pandas and OAuth 2.0 in Python. It is the only entity that connects to the database.
+- The data generator, implemented using Celery in Python, that generates random device data and sends to the API server, simulating the behavior of devices. It only communicates with the API server.
+- The web page frontend, implemented using Angular and hosted in a Nginx instance, that shows the device data. This web page only communicates with the API server.
+
+Every 5 seconds, the data generator will create a random number, between 1 and 5 (this is the velocity data of the device), for each of devices "Device_01", "Device_02" and "Device_03" (or any name listed in the file "data_generator/config.yaml"), and send a POST request to the API server at path "/v1/devices/{device_name}/velocity_data" to add this velocity data in the DB.
+
+The web page frontend has two pages: login and dashboard, shown in the images below. The dashboard page has two elements: a table of all devices with data present in the DB and a graph of the summed times of the data of these devices.
+
+- Login page:
+
+IMG_1
+
+- Dashboard page:
+
+IMG_2
+
+The dashboard table is updated every 5 seconds: each time, it is requested the list of devices with data present in the DB with a GET request to the API server at path "/v1/devices" and, for each device in the list, it is requested the latest data of the device with a GET request to the API server at "/v1/devices/{device_name}".
+
+The dashboard graph is updated every 60 seconds: each time, it is requested the list of devices with data present in the DB with a GET request to the API server at path "/v1/devices" and, for each device in the list, it is requested the summed timeseries of the device with 1 minute resolution (the data entries are grouped in sets of 1 minute interval and then summed) with a GET request to the API server at "/v1/devices/{device_name}/timeseries" using the parameters "hours_since=1" (to get data since 1 hour ago) and "resolution=1". This summed timeseries is calculated using Pandas in the API server.
+
+The API server access is protected by authentication: both the web page frontend and the data generator need to send an authentication token in each request. The OAuth 2.0 flow implemented in this application is the "password" flow: the client sends the username and password in a POST request to the API server at "/v1/auth/token" to get a token, to be used later in any request. To get more information about the user authenticated, a GET request with the token can be made to API server at path "/v1/auth/userinfo".
+
+The documentation of this API can be found at http://localhost:8000/docs .
 
 ## How to use
 
-Clone this repository and run `docker compose up` inside the repository folder (tested on Ubuntu 22.04.4 LTS with Docker Desktop 4.32.0). When all containers are running, open a browser and access http://localhost:3000 , where is the login screen of Grafana. Click in the "Sign in with GitHub" button to log in using your GitHub account. On the left menu, click in "Dashboards" and after in "Device Acceleration Velocity Dashboard". The dashboard shown in the image below will appear. If there is no data, wait 1 minute and it should be updated.
-
-![dashboard](https://github.com/user-attachments/assets/c2169a16-c084-42a8-9dfe-aff4f63e1983)
-
-To allow further interaction with the system, the ports of the API server (number 8000) and the database (number 5432) are exposed outside the docker network. The API server documentation can be accessed at http://localhost:8000/docs .
+Clone this repository and run `docker compose up` inside the repository folder (tested on Ubuntu 22.04.4 LTS with Docker Desktop 4.32.0 and Chrome 127.0.6533.88). When all containers are running, open a browser and access http://localhost:4200 . You will be redirected to the login screen. There are two users registered in the DB: you can either use user "user01" and password "password" or user "admin" and password "admin". Click in the "Login" button and the dashboard page should appear.
 
 ## Folder structure
 
@@ -34,6 +52,7 @@ An explanation about the files of the repository is shown below.
 │   ├── routers
 │   │   ├── __init__.py
 │   │   └── v1
+│   │       ├── auth.py        # Contains the authentication API endpoints implementation.
 │   │       ├── devices.py     # Contains the devices API endpoints implementation.
 │   │       └── __init__.py
 │   └── schemas.py             # Contains the Pydantic models/schemas.
@@ -45,69 +64,10 @@ An explanation about the files of the repository is shown below.
 │   └── tasks.py               # Contains the implementation of the periodic generation of random device data.
 ├── docker-compose.yaml
 ├── frontend
+│   ├── deviceapp
+│   │   ├── (...)              # The Angular project files.
 │   ├── Dockerfile
-│   └── grafana_cfg
-│       ├── grafana.db
-│       └── grafana.ini
+│   └── nginx.conf             # The Nginx configuration file.
+├── LICENSE
 └── README.md
 ```
-
-## Description of the API
-
-An explanation about the API is shown below.
-
-```
-1) GET /v1/devices
-   Gets the list of all devices with at least one data entry on the DB.
-   Returns: the device list (list of strings).
-
-2) GET /v1/devices/{device_name}
-   Get the latest data of a specific device
-   Parameters:
-     - device_name: the device name (string).
-   Returns: the device name (string), the vibration velocity (integer) and
-            the timestamp of this data (time formatted string).
-
-3) POST /v1/devices/{device_name}/velocity_data
-   Add device velocity data to the DB.
-   Parameters:
-     - device_name: the device name (string).
-     - vibration_velocity: the vibration velocity (integer).
-   Returns: the same device name (string) and vibration velocity (integer),
-            and also the timestamp of this data (time formatted string).
-
-4) GET /v1/devices/{device_name}/timeseries
-   Get a summed timeseries with the specified resolution.
-   Parameters:
-     - device_name: the device name (string).
-     - hours_since: the number of hours before now to fetch device data (integer).
-       Example: 2 means "fetch data from 2 hours ago to now".
-       Note: restricted to values from 1 to 12.
-     - resolution: the resolution in minutes (integer).
-       Note: restricted to values from 1 to 60.
-   Returns: a list of data points of UNIX timestamp (float) and velocity data (integer).
-```
-
-## License
-
-MIT License
-
-Copyright (c) 2024 João Victor Portal.
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.

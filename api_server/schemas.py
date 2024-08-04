@@ -5,8 +5,8 @@ from pydantic import BaseModel
 from typing_extensions import TypedDict
 
 class DataPoint(TypedDict):
-    timestamp: float
-    vibration_velocity: int
+    x: float
+    y: int
 
 class DataPointList(BaseModel):
     data_point_list: list[DataPoint]
@@ -18,3 +18,7 @@ class TimeSeriesEntry(BaseModel):
     device_name: str
     vibration_velocity: int
     timestamp: datetime
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
