@@ -17,11 +17,11 @@ The web page frontend has two pages: login and dashboard, shown in the images be
 
 - Login page:
 
-IMG_1
+![login](https://github.com/user-attachments/assets/d3b41577-c35a-4ea6-b730-3552957894f8)
 
 - Dashboard page:
 
-IMG_2
+![dashboard](https://github.com/user-attachments/assets/3481c3ce-ea27-4a16-8111-4c53db1202c6)
 
 The dashboard table is updated every 5 seconds: each time, it is requested the list of devices with data present in the DB with a GET request to the API server at path "/v1/devices" and, for each device in the list, it is requested the latest data of the device with a GET request to the API server at "/v1/devices/{device_name}".
 
