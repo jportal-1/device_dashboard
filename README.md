@@ -2,7 +2,7 @@
 
 ## What it is
 
-This application is a full stack solution to showcase the following technologies: Docker, PostgreSQL, FastAPI (Python framework for API server), SQLAlchemy (SQL toolkit and ORM in Python), Pydantic (data parsing and validation in Python), Pandas (data manipulation and analysis in Python), Celery (task queue in Python), TypeScript (superset of JavaScript language), Angular (TypeScript-based web framework), Nginx (HTTP server) and OAuth 2.0 (authorization protocol).
+This application is a full stack solution to showcase the following technologies: Docker, PostgreSQL, Python, FastAPI (Python framework for API server), SQLAlchemy (SQL toolkit and ORM in Python), Pydantic (data parsing and validation in Python), Pandas (data manipulation and analysis in Python), Celery (task queue in Python), TypeScript (superset of JavaScript language), Angular (TypeScript-based web framework), Nginx (HTTP server) and OAuth 2.0 (authorization protocol).
 
 The application is a dashboard that monitors the vibration velocity of devices. It is composed of 4 parts, each running inside a container, described below.
 
