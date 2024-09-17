@@ -10,7 +10,7 @@ token = ''
 def get_token(username, password):
     url = f"http://api-server:8000/v1/auth/token"
     headers = {'accept': 'application/json', 'Content-Type': 'application/x-www-form-urlencoded'}
-    data = f'grant_type=&username={username}&password={password}&scope=&client_id=&client_secret='
+    data = f'grant_type=password&username={username}&password={password}&scope=&client_id=&client_secret='
     try:
         response = requests.post(url=url, headers=headers, data=data)
         if response.status_code == 200:
